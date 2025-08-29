@@ -489,3 +489,99 @@ window.addEventListener('load', async ()=>{
   // attach global FS button if present
   window.doFullscreen = doFullscreen;
 });
+
+/* ======================================================
+   Auto Playlist by Tags (new + existing videos)
+   ====================================================== */
+
+// Helper: add video to playlist (create playlist if missing)
+async function ensurePlaylistForTag(tag, videoId) {
+  // Check if playlist exists
+  const { data: existing, error } = await supabase
+    .from('playlists')
+    .select('*')
+    .eq('name', tag)
+    .maybeSingle();
+
+  let playlistId;
+  if (existing) {
+    playlistId = existing.id;
+  } else {
+    // Create playlist with this tag name
+    const { data: created, error: createErr } = await supabase
+      .from('playlists')
+      .insert([{ name: tag, video_ids: [] }])
+      .select()
+      .single();
+    if (createErr) {
+      console.error("❌ Playlist create failed:", createErr);
+      return;
+    }
+    playlistId = created.id;
+  }
+
+  // Add video to playlist (avoid duplicates)
+  const { data: playlist, error: selErr } = await supabase
+    .from('playlists')
+    .select('video_ids')
+    .eq('id', playlistId)
+    .single();
+
+  if (selErr) {
+    console.error("❌ Playlist fetch failed:", selErr);
+    return;
+  }
+
+  let videoIds = playlist.video_ids || [];
+  if (!videoIds.includes(videoId)) {
+    videoIds.push(videoId);
+    const { error: updErr } = await supabase
+      .from('playlists')
+      .update({ video_ids: videoIds })
+      .eq('id', playlistId);
+    if (updErr) console.error("❌ Failed to add video to playlist:", updErr);
+  }
+}
+
+// Patch createVideo so new uploads update playlists
+const _origCreateVideo = createVideo;
+createVideo = async function({ title, iframe_html, tags = [], thumbnail_url = '' }) {
+  const created = await _origCreateVideo({ title, iframe_html, tags, thumbnail_url });
+  if (created && created[0]) {
+    const videoId = created[0].id;
+    if (Array.isArray(tags)) {
+      for (const t of tags) {
+        await ensurePlaylistForTag(t, videoId);
+      }
+    }
+  }
+  return created;
+};
+
+// Backfill existing videos on load
+async function backfillTagPlaylists() {
+  try {
+    const { data: videos, error } = await supabase.from('videos').select('*');
+    if (error) {
+      console.error("❌ Error fetching videos for backfill:", error);
+      return;
+    }
+    for (const vid of videos) {
+      if (Array.isArray(vid.tags)) {
+        for (const t of vid.tags) {
+          await ensurePlaylistForTag(t, vid.id);
+        }
+      }
+    }
+    console.log("✅ Backfill complete: tag-based playlists updated.");
+  } catch (err) {
+    console.error("❌ Backfill failed:", err);
+  }
+}
+
+// Run backfill once on app load
+backfillTagPlaylists();
+
+
+
+
