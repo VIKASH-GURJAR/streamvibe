@@ -45,9 +45,51 @@ body{
 .tag{display:inline-block;padding:4px 8px;border-radius:999px;font-size:0.75rem;background:#07121a;color:var(--muted);margin-right:6px;margin-top:8px}
 
 /* three dots & popup */
-.moreBtn{background:transparent;border:0;color:inherit;font-size:18px;cursor:pointer}
-.menu-popup{position:absolute; right:8px; top:8px; display:flex; flex-direction:column; gap:6px; background:#071018; padding:8px;border-radius:8px; box-shadow:0 4px 18px rgba(0,0,0,0.6); z-index:60}
-.menu-popup button{background:transparent;border:0;color:var(--muted); padding:8px 10px; text-align:left}
+.moreBtn {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  font-size: 26px;  /* bigger clickable area */
+  cursor: pointer;
+  padding: 8px;     /* extra padding for click target */
+  border-radius: 6px;
+}
+
+.moreBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.menu-popup {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #0d1b2a;
+  padding: 14px 12px;     /* bigger padding */
+  border-radius: 12px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.7);
+  z-index: 60;
+  min-width: 180px;       /* make popup wider */
+}
+
+.menu-popup button {
+  background: transparent;
+  border: 0;
+  color: #e6edf3;
+  padding: 12px 14px;     /* larger clickable area */
+  text-align: left;
+  font-size: 0.95rem;     /* slightly larger text */
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.menu-popup button:hover {
+  background: rgba(255,255,255,0.1);
+  color: white;
+}
+
 
 /* modal */
 .modal{position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.5); z-index:70}
@@ -61,3 +103,41 @@ body{
 /* small helpers */
 .small{font-size:0.85rem;color:var(--muted)}
 .form-actions{display:flex; gap:10px; margin-top:10px}
+
+/* Playlist buttons */
+.btn.view {
+  background: #22c55e; /* green */
+  color: white;
+  border: 0;
+}
+.btn.view:hover {
+  background: #16a34a;
+}
+
+.btn.delete {
+  background: #ef4444; /* red */
+  color: white;
+  border: 0;
+}
+.btn.delete:hover {
+  background: #dc2626;
+}
+
+
+/* Restore button in deleted page */
+.btn.restore {
+  background: #22c55e;   /* green */
+  color: white;
+  border: none;
+  padding: 10px 16px;    /* bigger click area */
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn.restore:hover {
+  background: #16a34a;   /* darker green on hover */
+}
+
