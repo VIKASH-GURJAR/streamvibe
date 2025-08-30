@@ -305,7 +305,7 @@ async function renderPlaylistsPage(){
     </div><div class="small">${(p.video_ids||[]).length} videos</div>`;
     container.appendChild(el);
   });
-  // attach handlers
+  //attach handlers
   container.querySelectorAll('.view').forEach(b=>{
     b.addEventListener('click', async e=>{
       const id = e.currentTarget.dataset.id;
@@ -327,6 +327,11 @@ async function renderPlaylistsPage(){
       vids.forEach(v=>containerV.appendChild(renderVideoCard(v)));
     });
   });
+
+
+
+
+
   container.querySelectorAll('.delete').forEach(b=>{
     b.addEventListener('click', async e=>{
       const id = e.currentTarget.dataset.id;
@@ -347,9 +352,10 @@ async function renderDeletedPage(){
   deleted.forEach(v=>{
     const el = renderVideoCard(v);
     // override menu to have Restore button
-    const restoreBtn = document.createElement('button');
-    restoreBtn.textContent='Restore';
-    restoreBtn.className='btn';
+  const restoreBtn = document.createElement('button');
+restoreBtn.textContent = 'Restore';
+restoreBtn.className = 'btn restore';
+
     restoreBtn.addEventListener('click', async ()=> {
       await restoreVideo(v.id);
       renderDeletedPage();
